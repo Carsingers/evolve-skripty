@@ -13,3 +13,5 @@ Co skript dělá: světelné sloupce na tmavých sekcích, kreslení mřížek a
 Načítání přes jsDelivr s pevnou verzí (tag), např. `https://cdn.jsdelivr.net/gh/Carsingers/evolve-skripty@v1.0.0/evolve.min.js`, ve Webflow jako registrovaný skript s SRI otiskem. Nová verze = nový tag; starý tag se nemění.
 
 Sestavení: `npx esbuild evolve.js --minify --target=es2018 --outfile=evolve.min.js` a `npx esbuild evolve.css --minify --outfile=evolve.min.css`.
+
+Pozor při vydání: po pushnutí tagu počkat, až https://data.jsdelivr.com/v1/packages/gh/Carsingers/evolve-skripty@<tag> uvede `evolve.min.js`; dřívější dotaz na `.min.js` nechá jsDelivr vyrobit vlastní minifikaci a SRI pak nesedí. Proto vynechané v1.0.1.
