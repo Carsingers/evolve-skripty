@@ -36,8 +36,9 @@
 
 /* Mřížky: linky se kreslí, obsah naběhne za nimi */
 .ev-cell{position:relative}
-.js-mrizka .cells_component{border-top-color:transparent;border-left-color:transparent}
-.js-mrizka .ev-cell{border-right-color:transparent;border-bottom-color:transparent}
+/* Linky kreslí pseudoprvky; okraje z Webflow musí mít nulovou šířku, jinak průhledný 1px okraj prosvítá pozadím (mezi tmavými buňkami, kolem rámu). */
+.js-mrizka .cells_component{border-top-width:0;border-left-width:0}
+.js-mrizka .ev-cell{border-right-width:0;border-bottom-width:0}
 .js-mrizka .cells_component::before,.js-mrizka .cells_component::after,.js-mrizka .ev-cell::before,.js-mrizka .ev-cell::after{content:"";position:absolute;pointer-events:none;background:var(--_theme---border--primary)}
 .js-mrizka .cells_component::before,.js-mrizka .cells_component::after{z-index:0}
 .js-mrizka .ev-cell::before,.js-mrizka .ev-cell::after{z-index:2}
@@ -56,6 +57,8 @@
 .je-aktivni>.ev-fill i{transform:scale(1,1);transition-delay:0s}
 .ev-sit>.cells_item,.ev-steps>.cells_item{z-index:1}
 .ev-steps .ev-fill i{background:var(--ev-card);transition:transform .16s linear}
+/* Bílá výplň kroku nesmí překrýt vnější linky mřížky. */
+.js-mrizka .ev-steps:before,.js-mrizka .ev-steps:after{z-index:2}
 .ev-steps .je-aktivni>.ev-fill i{transition:transform .55s var(--ev-plyn)}
 
 /* Odpočet: číslo a zlatá linka */
@@ -143,7 +146,10 @@
 .w-mod-js .hero_grid>div:first-child{animation:ev-nahoru .7s var(--ev-ease) .1s both}
 /* pojistka: kdyby skript nedorazil, nic v heru nezůstane schované */
 @keyframes ev-pojistka{to{opacity:1;translate:0 0}}
-.w-mod-js .section_hero:not(.prisunuto) .hero_visual{opacity:0;translate:31% 0;animation:ev-pojistka 0s 4s forwards}
+/* Ruka má na tabletu a mobilu průhlednost .28 (Webflow); pojistka ani omezený pohyb ji nesmí vrátit na 1. */
+@keyframes ev-pojistka-v{to{opacity:var(--hv-op,1);translate:0 0}}
+@media (max-width:991px){.hero_visual{--hv-op:.28}}
+.w-mod-js .section_hero:not(.prisunuto) .hero_visual{opacity:0;translate:31% 0;animation:ev-pojistka-v 0s 4s forwards}
 .w-mod-js .section_hero:not(.sviti) .hero_visual-image.is-lit{animation:ev-pojistka 0s 4s forwards}
 .section_hero.prisunuto .hero_visual{transition:opacity .85s var(--ev-ease),translate 1.2s var(--ev-ease)}
 .w-mod-js .section_hero:not(.sviti) .hero_visual-image.is-lit{opacity:0}
@@ -220,7 +226,7 @@
 .osnova i,.js-mrizka .cells_component::before,.js-mrizka .cells_component::after,.js-mrizka .ev-cell::before,.js-mrizka .ev-cell::after{transform:none!important}
 .ev-js .ev-reveal,.ev-js .ev-reveal .cast,.js-mrizka .ev-cell>*{opacity:1!important;transform:none!important}
 .w-mod-js .hero_grid>div:first-child{animation:none}
-.w-mod-js .section_hero .hero_visual{opacity:1;translate:none}
+.w-mod-js .section_hero .hero_visual{opacity:var(--hv-op,1);translate:none}
 .w-mod-js .section_hero .hero_visual-image.is-lit,.hero_glow{opacity:1}
 .ev-panel .flow_text,.ev-panel .flow_fig{opacity:1;transform:none}
 .vdlg::backdrop{animation:none}
@@ -240,3 +246,6 @@
 .js-mrizka .ev-flow>.is-active::after,.js-mrizka .ev-flow>.bez-svisle::after{opacity:0;transition-delay:var(--dv,.3s),0s}
 @media (max-width:991px){.js-mrizka .ev-flow>.bez-vodorovne::before{opacity:0;transition-delay:var(--dh,.18s),0s}}
 
+
+/* Zavřené karty postupu mají nadpis v barvě textu, otevřená světlý (předloha .flowT). */
+.ev-flow>.cells_item:not(.is-active)>h3{color:var(--_theme---text--body)}
