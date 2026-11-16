@@ -144,6 +144,8 @@
     if (!sekce.length) return;
     sekce.forEach(function (sec) {
       sec.classList.add('ruled');
+      // mřížky dostanou podklad sekce, aby jimi osnova neprosvítala
+      sec.style.setProperty('--ev-bg', getComputedStyle(sec).backgroundColor);
       var o = el('div', 'osnova'); o.setAttribute('aria-hidden', 'true');
       for (var i = 0; i < 6; i++) { var l = el('i'); l.style.setProperty('--d', (i * 0.075).toFixed(3) + 's'); o.appendChild(l); }
       sec.insertBefore(o, sec.firstChild);

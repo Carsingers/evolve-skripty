@@ -17,6 +17,7 @@
 .ruled.kresleno .osnova i{transform:scaleY(1)}
 .stitek{position:absolute;left:18px;top:118px;z-index:1;pointer-events:none;writing-mode:vertical-rl;font:500 10.5px/1 var(--_typography---font--body);letter-spacing:.2em;text-transform:uppercase;color:var(--ev-muted);opacity:0;transition:opacity .9s var(--ev-ease) .55s}
 .ruled.kresleno .stitek{opacity:.6}
+.ruled .cells_component,.ruled .rov_component{background-color:var(--ev-bg,transparent)}
 @media (max-width:1380px){.stitek{display:none}}
 
 /* Mřížky: linky se kreslí, obsah naběhne za nimi */
