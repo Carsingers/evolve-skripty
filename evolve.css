@@ -189,7 +189,10 @@
 
 /* Navigace a patička */
 .navbar_link[aria-current=true]{color:var(--ev-on);border-bottom-color:var(--ev-gold)}
-.odhaluje-paticku .main-wrapper{position:relative;z-index:1;margin-bottom:var(--vyska-paticky,0px);background-color:var(--ev-paper)}
+/* místo pro patičku drží vnitřní odsazení obalu stránky; spodní okraj
+   main-wrapperu by propadl ven a do výšky dokumentu by se nezapočítal */
+.odhaluje-paticku .page-wrapper{padding-bottom:var(--vyska-paticky,0px)}
+.odhaluje-paticku .main-wrapper{position:relative;z-index:1;background-color:var(--ev-paper)}
 .odhaluje-paticku .footer_component{position:fixed;left:0;right:0;bottom:0;z-index:0}
 
 /* Jemné světlo na světlých sekcích */
