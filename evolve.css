@@ -102,7 +102,6 @@
 .ev-flow>.cells_item.is-flow{transition:flex-grow .85s var(--ev-plyn),background-color .7s var(--ev-plyn),color .7s var(--ev-plyn)}
 .ev-flow>.cells_item.is-flow:not(.is-active){cursor:pointer}
 .ev-flow .flow_number{transition:font-size .6s var(--ev-plyn),color .4s var(--ev-ease)}
-.ev-flow .flow_spacer{transition:flex-grow 1.1s var(--ev-plyn)}
 .ev-flow .is-active>.flow_spacer{flex-grow:0}
 .ev-flow h3[role=button]{cursor:pointer;transition:font-size .35s var(--ev-ease)}
 .ev-flow .is-active>h3[role=button]{cursor:default}
@@ -118,8 +117,6 @@
 .is-active .ev-panel .flow_fig{opacity:1;transform:none;transition:opacity var(--ev-t-text) var(--ev-plyn) .48s,transform var(--ev-t-posun) var(--ev-plyn) .48s}
 .ev-mereni,.ev-mereni *{transition:none!important}
 /* otevřená karta jako v návrhu: nadpis nahoře pod číslem, údaj dole */
-.ev-flow .flow_spacer{transition:flex-grow 1.1s var(--ev-plyn),min-height 1.1s var(--ev-plyn)}
-@media (min-width:992px){.ev-flow .is-active>.flow_spacer{min-height:2.125rem}}
 .ev-flow .is-active .ev-panel .margin-top{flex:0 0 auto}
 .ev-flow .ev-panel .flow_text{max-width:30rem}
 .ev-flow .is-active .ev-panel .flow_fig{margin-top:auto}
@@ -228,3 +225,18 @@
 .ev-panel .flow_text,.ev-panel .flow_fig{opacity:1;transform:none}
 .vdlg::backdrop{animation:none}
 }
+
+/* Karty postupu: obecný náběh mřížky (.js-mrizka .ev-cell>*) přepisoval
+   přechody přímých potomků karty, takže výška panelu ani mezera nad nadpisem
+   se neanimovaly a nadpis skočil nahoru. Tady se oba přechody spojí. */
+.js-mrizka .ev-flow>.ev-cell>.ev-panel{transition:height 1.1s var(--ev-plyn),opacity .6s var(--ev-plyn) var(--dt,.95s),transform .6s var(--ev-plyn) var(--dt,.95s)}
+/* Mezera nad nadpisem nemá vlastní přechod: pohyb nese výška panelu (JS), mezera bere jen zbytek. */
+.js-mrizka .ev-flow>.ev-cell>.flow_spacer{transition:opacity .6s var(--ev-plyn) var(--dt,.95s),transform .6s var(--ev-plyn) var(--dt,.95s)}
+.js-mrizka .ev-flow>.ev-cell>.flow_number{transition:font-size .6s var(--ev-plyn),color .4s var(--ev-ease),opacity .6s var(--ev-plyn) var(--dt,.95s),transform .6s var(--ev-plyn) var(--dt,.95s)}
+.js-mrizka .ev-flow>.ev-cell>h3[role=button]{transition:font-size .35s var(--ev-ease),color .7s var(--ev-plyn),opacity .6s var(--ev-plyn) var(--dt,.95s),transform .6s var(--ev-plyn) var(--dt,.95s)}
+.js-mrizka .cells_component>.ev-cell>.ev-poc{transition:opacity .45s var(--ev-ease)}
+/* Linky kolem otevřené karty postupu zmizí jako u situací. */
+.js-mrizka .ev-flow>.is-active::before{opacity:0;transition-delay:var(--dh,.18s),0s}
+.js-mrizka .ev-flow>.is-active::after,.js-mrizka .ev-flow>.bez-svisle::after{opacity:0;transition-delay:var(--dv,.3s),0s}
+@media (max-width:991px){.js-mrizka .ev-flow>.bez-vodorovne::before{opacity:0;transition-delay:var(--dh,.18s),0s}}
+

@@ -382,10 +382,27 @@
       pan.style.height = '';
       c.classList.remove('roste');
       stav(c, true);
-      var cil = pan.offsetHeight;
+      var cil = misto(c, pan);
       c.classList.add('roste');
       pan.style.height = '0px'; void pan.offsetHeight; pan.style.height = cil + 'px';
       pan._cas = setTimeout(function () { pan.style.height = ''; c.classList.remove('roste'); }, DOBA + 60);
+    }
+    // Cíl růstu je místo, které panelu v kartě zbude: výška karty minus
+    // ostatní obsah a nejmenší mezera nad nadpisem. Obsah panelu se měřit
+    // nedá, karta se v tu chvíli teprve rozšiřuje a text by vyšel vyšší,
+    // takže by nadpis na konci ještě dojel. Na mobilu jsou karty pod sebou
+    // a panel má výšku svého obsahu.
+    function misto(c, pan) {
+      if (matchMedia('(max-width: 991px)').matches) return pan.offsetHeight;
+      var cs = getComputedStyle(c), zbyva = c.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+      $$(':scope > *', c).forEach(function (ch) {
+        if (ch === pan) return;
+        var s = getComputedStyle(ch);
+        if (s.position === 'absolute' || s.position === 'fixed' || s.display === 'none') return;
+        var v = ch.classList.contains('flow_spacer') ? (parseFloat(s.minHeight) || 0) : ch.offsetHeight;
+        zbyva -= v + parseFloat(s.marginTop) + parseFloat(s.marginBottom);
+      });
+      return Math.max(Math.round(zbyva), 0);
     }
     function zavri(c, pan) {
       if (pan.hidden || !c.classList.contains('is-active')) { stav(c, false); return; }
@@ -427,6 +444,16 @@
         c.classList.remove('odpocita');
       });
       i = cards.indexOf(card); odpocet(card);
+      linky(card);
+    }
+    // Linky kolem otevřené karty zmizí, stejně jako u situací: její vlastní
+    // a ta, kterou kreslí soused před ní (vpravo, na mobilu dole).
+    function linky(card) {
+      cards.forEach(function (c, k) {
+        var pred = cards[k + 1] === card;
+        c.classList.toggle('bez-svisle', pred);
+        c.classList.toggle('bez-vodorovne', pred);
+      });
     }
     function dal() { open(cards[(i + 1) % cards.length]); }
     function start() { if (REDUCED || timer) return; timer = setInterval(dal, 5200); }
@@ -441,7 +468,7 @@
       } else spust();
       row.addEventListener('mouseenter', function () { stop(); row.classList.add('pauza'); });
       row.addEventListener('mouseleave', function () { row.classList.remove('pauza'); if (rozjeto) { odpocet(cards[i]); start(); } });
-    } else cards.forEach(function (c, k) { stav(c, k === 0); var pan = panel(c); if (pan) pan.hidden = k !== 0; });
+    } else { cards.forEach(function (c, k) { stav(c, k === 0); var pan = panel(c); if (pan) pan.hidden = k !== 0; }); linky(cards[0]); }
     var t = null;
     cards.forEach(function (c) {
       var h = c.querySelector(':scope > h3');
