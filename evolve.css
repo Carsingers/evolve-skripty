@@ -3,6 +3,17 @@
    ev- a stavové třídy (in, nakresleno, je-aktivni…) přidává skript. */
 :root{--ev-navy:var(--_primitives---navy--900);--ev-gold:var(--_primitives---gold--500);--ev-paper:var(--_primitives---neutral--paper);--ev-card:var(--_primitives---neutral--white);--ev-line2:var(--_primitives---neutral--line-strong);--ev-on:var(--_primitives---neutral--paper);--ev-on-dim:var(--_primitives---neutral--on-navy-dim);--ev-on-faint:var(--_primitives---neutral--on-navy-faint);--ev-muted:var(--_primitives---neutral--muted);--ev-ease:cubic-bezier(.16,1,.3,1);--ev-plyn:cubic-bezier(.32,.72,0,1);--ev-t-text:.72s;--ev-t-posun:.95s}
 
+/* Tlačítka: přejezd kroužku a textu jako v návrhu */
+.ev-btn{position:relative;--ev-e:cubic-bezier(.625,.05,0,1)}
+.ev-btn>.button_text{position:relative;z-index:1;transform:translateX(-2.95em);transition:transform .735s var(--ev-e)}
+.ev-btn>.button_icon.is-start{position:relative;z-index:1;transform:scale(0);transform-origin:left;transition:transform .735s var(--ev-e)}
+.ev-btn>.button_icon.is-end{position:absolute;right:0;top:0;z-index:2;transform:scale(1);transform-origin:right;transition:transform .735s var(--ev-e)}
+.ev-btn:hover>.button_text,.ev-btn:focus-visible>.button_text{transform:translateX(0)}
+.ev-btn:hover>.button_icon.is-start,.ev-btn:focus-visible>.button_icon.is-start{transform:scale(1)}
+.ev-btn:hover>.button_icon.is-end,.ev-btn:focus-visible>.button_icon.is-end{transform:scale(0)}
+.has-cols .button .button_icon{background-color:var(--ev-navy)}
+@media (prefers-reduced-motion:reduce){.ev-btn>.button_text{transform:none}.ev-btn>.button_icon.is-start{display:none}.ev-btn>.button_icon.is-end{position:static;transform:none}}
+
 /* Sloupce na tmavých sekcích */
 .has-cols{position:relative;overflow:hidden}
 .has-cols>.cols{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;display:block}
@@ -17,7 +28,7 @@
 .ruled.kresleno .osnova i{transform:scaleY(1)}
 .stitek{position:absolute;left:18px;top:118px;z-index:1;pointer-events:none;writing-mode:vertical-rl;font:500 10.5px/1 var(--_typography---font--body);letter-spacing:.2em;text-transform:uppercase;color:var(--ev-muted);opacity:0;transition:opacity .9s var(--ev-ease) .55s}
 .ruled.kresleno .stitek{opacity:.6}
-.ruled .cells_component,.ruled .rov_component{background-color:var(--ev-bg,transparent)}
+.ruled .cells_component,.ruled .rov_component,.has-cols .cells_component{background-color:var(--ev-bg,transparent)}
 @media (max-width:1380px){.stitek{display:none}}
 
 /* Mřížky: linky se kreslí, obsah naběhne za nimi */
@@ -100,6 +111,15 @@
 .ev-panel .flow_text,.ev-panel .flow_fig{opacity:0;transform:translateY(16px);transition:opacity .26s var(--ev-plyn),transform .26s var(--ev-plyn)}
 .is-active .ev-panel .flow_text{opacity:1;transform:none;transition:opacity var(--ev-t-text) var(--ev-plyn) .36s,transform var(--ev-t-posun) var(--ev-plyn) .36s}
 .is-active .ev-panel .flow_fig{opacity:1;transform:none;transition:opacity var(--ev-t-text) var(--ev-plyn) .48s,transform var(--ev-t-posun) var(--ev-plyn) .48s}
+.ev-mereni,.ev-mereni *{transition:none!important}
+/* otevřená karta jako v návrhu: nadpis nahoře pod číslem, údaj dole */
+.ev-flow .flow_spacer{transition:flex-grow 1.1s var(--ev-plyn),min-height 1.1s var(--ev-plyn)}
+@media (min-width:992px){.ev-flow .is-active>.flow_spacer{min-height:2.125rem}}
+.ev-flow .is-active .ev-panel .margin-top{flex:0 0 auto}
+.ev-flow .ev-panel .flow_text{max-width:30rem}
+.ev-flow .is-active .ev-panel .flow_fig{margin-top:auto}
+.ev-flow .ev-panel>div::after{content:"";order:1;flex:0 0 1.5rem}
+.ev-flow .ev-panel .flow_fig{order:2}
 .ev-flow .is-active>.ev-poc{opacity:1}
 .ev-flow .ev-poc{top:26px;right:28px}
 

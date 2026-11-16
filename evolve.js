@@ -32,6 +32,21 @@
     }, ms || 500);
   }
 
+  /* 0. Tlačítka jako v návrhu: na najetí vyjede zleva kroužek se šipkou,
+     text odjede doprava a pravý kroužek zanikne. Levý kroužek je kopie
+     pravého, dělá ho skript, aby komponenta v Designeru zůstala čistá. */
+  (function () {
+    $$('a.button').forEach(function (b) {
+      var ik = b.querySelector(':scope > .button_icon');
+      if (!ik || b.querySelector(':scope > .button_icon.is-start')) return;
+      var kopie = ik.cloneNode(true);
+      kopie.classList.add('is-start'); kopie.setAttribute('aria-hidden', 'true');
+      ik.classList.add('is-end');
+      b.insertBefore(kopie, b.firstChild);
+      b.classList.add('ev-btn');
+    });
+  })();
+
   /* 1. Sloupce na tmavých sekcích: svislé pruhy, kterými projíždí světlá
      vlna, kurzor pod sebou rozsvítí modravý nádech. */
   (function () {
@@ -43,6 +58,8 @@
       c.setAttribute('aria-hidden', 'true');
       c.dataset.seed = (i * 1.55).toFixed(2);
       sec.classList.add('has-cols');
+      // mřížky dostanou plný podklad sekce, pruhy jimi neprosvítají
+      sec.style.setProperty('--ev-bg', getComputedStyle(sec).backgroundColor);
       sec.insertBefore(c, sec.firstChild);
       return c;
     });
@@ -353,6 +370,27 @@
       pan.style.height = '0px';
       pan._cas = setTimeout(function () { pan.hidden = true; pan.style.width = ''; pan.style.height = ''; c.classList.remove('roste'); }, DOBA + 60);
     }
+    // Výška řady se zamkne na nejvyšší ze tří otevřených stavů, aby se při
+    // přepínání neposouval obsah stránky pod ní. Měří se bez animací ještě
+    // před vykreslením; na mobilu jsou karty pod sebou a řada růst musí.
+    var cas = null;
+    function zmer() {
+      row.style.minHeight = '';
+      if (matchMedia('(max-width: 991px)').matches) return;
+      var puvodni = cards.map(function (c) { var p = panel(c); return [c.classList.contains('is-active'), p.hidden, p.style.height, p.style.width]; });
+      row.classList.add('ev-mereni');
+      var max = 0;
+      cards.forEach(function (c) {
+        cards.forEach(function (d) { var p = panel(d); stav(d, d === c); p.hidden = d !== c; p.style.height = ''; p.style.width = ''; });
+        max = Math.max(max, row.offsetHeight);
+      });
+      cards.forEach(function (d, k) { var p = panel(d); stav(d, puvodni[k][0]); p.hidden = puvodni[k][1]; p.style.height = puvodni[k][2]; p.style.width = puvodni[k][3]; });
+      void row.offsetHeight;
+      row.classList.remove('ev-mereni');
+      row.style.minHeight = max + 'px';
+    }
+    zmer();
+    addEventListener('resize', function () { clearTimeout(cas); cas = setTimeout(zmer, 200); });
     var i = 0, timer = null, rozjeto = false;
     function odpocet(c) { if (REDUCED) return; c.classList.remove('odpocita'); void c.offsetWidth; c.classList.add('odpocita'); }
     function open(card) {
