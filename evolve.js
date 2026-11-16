@@ -47,11 +47,27 @@
     });
   })();
 
+  /* 0b. Závěr stránky: poslední tmavá sekce a patička tvoří jeden blok,
+     jako v návrhu. Dostane společné pozadí se sloupci a odkrývá se celý.
+     Bez skriptu zůstávají obě části za sebou v toku. */
+  (function () {
+    var hlavni = D.querySelector('.main-wrapper'), pat = D.querySelector('.footer_component');
+    if (!hlavni || !pat || hlavni.nextElementSibling !== pat) return;
+    var posledni = hlavni.lastElementChild;
+    if (!posledni || !posledni.matches('.section_layout') || !tmava(posledni)) return;
+    var end = el('div', 'ev-end');
+    hlavni.parentNode.insertBefore(end, pat);
+    end.appendChild(posledni);
+    end.appendChild(pat);
+  })();
+
   /* 1. Sloupce na tmavých sekcích: svislé pruhy, kterými projíždí světlá
      vlna, kurzor pod sebou rozsvítí modravý nádech. */
   (function () {
     if (REDUCED) return;
-    var secs = $$('.section_hero, .section_layout, .footer_component').filter(tmava);
+    var secs = $$('.ev-end, .section_hero, .section_layout, .footer_component').filter(function (s) {
+      return s.classList.contains('ev-end') || (!s.closest('.ev-end') && tmava(s));
+    });
     if (!secs.length) return;
     var canvases = secs.map(function (sec, i) {
       var c = el('canvas', 'cols');
@@ -137,8 +153,18 @@
     }
     // kreslí se jen to, co je vidět; bez kurzoru stačí 30 snímků za vteřinu
     var bezi = false, minuly = 0;
+    // Odkrývaný závěr je fixní, pozorovatel by ho hlásil pořád jako vidět.
+    // Kreslí se, jen když nad ním obsah stránky skutečně odjel.
+    var hlavni = D.querySelector('.main-wrapper');
+    function zaverVidet(P) {
+      var s = P.c.parentElement;
+      if (!s.classList.contains('ev-odhal') || !hlavni) return null;
+      return hlavni.getBoundingClientRect().bottom < innerHeight;
+    }
+    addEventListener('scroll', function () { probud(); }, { passive: true });
     function loop(ts) {
       var i, hover = false;
+      for (i = 0; i < state.length; i++) { var z = zaverVidet(state[i]); if (z !== null) state[i].vis = z; }
       for (i = 0; i < state.length; i++) if (state[i].on) hover = true;
       if (!hover && ts - minuly < 32) { requestAnimationFrame(loop); return; }
       minuly = ts;
@@ -836,13 +862,15 @@
 
   /* 16. Patičku odhalí obsah, který po ní sjede. */
   (function () {
-    var pat = D.querySelector('.footer_component'), hlavni = D.querySelector('.main-wrapper');
+    var pat = D.querySelector('.ev-end') || D.querySelector('.footer_component'), hlavni = D.querySelector('.main-wrapper');
     if (!pat || !hlavni || REDUCED) return;
+    pat.classList.add('ev-odhal');
     var cas = null;
     function prepocti() {
       R.classList.remove('odhaluje-paticku');
       var v = pat.offsetHeight;
-      if (v && v <= innerHeight * 0.85) { R.style.setProperty('--vyska-paticky', v + 'px'); R.classList.add('odhaluje-paticku'); }
+      // na nízkém okně by se horní část závěru nedala zobrazit, zůstává v toku
+      if (v && v <= innerHeight) { R.style.setProperty('--vyska-paticky', v + 'px'); R.classList.add('odhaluje-paticku'); }
     }
     function naplanuj() { clearTimeout(cas); cas = setTimeout(prepocti, 120); }
     prepocti();

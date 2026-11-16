@@ -193,7 +193,11 @@
    main-wrapperu by propadl ven a do výšky dokumentu by se nezapočítal */
 .odhaluje-paticku .page-wrapper{padding-bottom:var(--vyska-paticky,0px)}
 .odhaluje-paticku .main-wrapper{position:relative;z-index:1;background-color:var(--ev-paper)}
-.odhaluje-paticku .footer_component{position:fixed;left:0;right:0;bottom:0;z-index:0}
+.odhaluje-paticku .ev-odhal{position:fixed;left:0;right:0;bottom:0;z-index:0}
+/* závěr: výzva a patička jako jeden tmavý blok se společnými sloupci */
+.ev-end{background-color:var(--ev-navy)}
+.ev-end>.section_layout,.ev-end>.footer_component{background-color:transparent}
+.ev-end>:not(.cols){position:relative;z-index:1}
 
 /* Jemné světlo na světlých sekcích */
 #jak-pracujeme{background-image:radial-gradient(700px 420px at 88% 0%,rgba(96,128,186,.085),transparent 70%)}
