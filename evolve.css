@@ -78,27 +78,30 @@
 .ev-sit .je-aktivni .situation_text{color:var(--ev-on-dim)}
 .ev-sit .je-aktivni .text-style-kicker,.ev-sit .je-aktivni .situation_fig{color:var(--ev-gold)}
 .ev-sit .je-aktivni .situation_tag,.ev-sit .je-aktivni .situation_note{color:var(--ev-on-faint)}
-.ev-sit .situation_viz{transition:border-color .6s var(--ev-plyn)}
 .ev-sit .je-aktivni .situation_viz{border-top-color:rgba(245,246,248,.1)}
 .js-mrizka .ev-sit>.je-aktivni::before,.js-mrizka .ev-sit>.bez-vodorovne::before{opacity:0;transition-delay:var(--dh,.18s),0s}
 .js-mrizka .ev-sit>.je-aktivni::after,.js-mrizka .ev-sit>.bez-svisle::after{opacity:0;transition-delay:var(--dv,.3s),0s}
 .ev-sit>.cells_item{cursor:default}
 .ev-sit>.cells_item:focus-visible{outline:2px solid var(--ev-gold);outline-offset:-2px}
 @media (min-width:992px){
-.ev-sit .situation_spacer{flex:1 1 0;min-height:.875rem;transition:flex-grow 1.1s var(--ev-plyn) .2s}
+/* Text a doklad v jednom panelu (JS), stejná mechanika jako karty postupu:
+   panel roste výškou 1,1 s, mezera nad nadpisem nemá vlastní přechod, takže
+   nadpis vyjíždí jednou křivkou. Zavřený panel drží 21 px (odsazení dokladu
+   z návrhu), aby nadpis zavřené karty seděl. */
+.ev-sit .situation_spacer{flex:1 1 0;min-height:.875rem}
 .ev-sit .je-aktivni .situation_spacer{flex-grow:0}
+.ev-sit .roste .situation_spacer{flex-grow:1!important}
 /* Karta situace podle návrhu: 34 px nahoře i dole, štítek drží od nadpisu 14 px i v rozbaleném stavu. */
 .ev-sit>.cells_item{padding-top:2.125rem;padding-bottom:2.125rem}
-.ev-mezera2{flex:0 1 0;min-height:0;transition:flex-grow 1.1s var(--ev-plyn) .2s}
-.je-aktivni .ev-mezera2{flex-grow:1}
-.ev-open{display:grid;grid-template-rows:0fr;transition:grid-template-rows 1.1s var(--ev-plyn)}
-.ev-open>div{overflow:hidden;min-height:0}
-/* Nájezd textu jako v kartách postupu: 16 px, pomalé objevení, rychlé zmizení. Rozbalení startuje o .2 s později (nejdřív výplň), proto zpoždění +.2 s. */
-.ev-open .margin-top{opacity:0;transform:translateY(16px);transition:opacity .26s var(--ev-plyn),transform .26s var(--ev-plyn)}
-.je-aktivni .ev-open{grid-template-rows:1fr;transition-delay:.2s}
-.je-aktivni .ev-open .margin-top{opacity:1;transform:none;transition:opacity var(--ev-t-text) var(--ev-plyn) .56s,transform var(--ev-t-posun) var(--ev-plyn) .56s}
-.ev-sit .situation_viz{opacity:0;max-height:0;margin-top:0;overflow:hidden;transform:translateY(16px);transition:opacity .26s var(--ev-plyn),transform .26s var(--ev-plyn),max-height 1.1s var(--ev-plyn),margin-top 1.1s var(--ev-plyn),border-color .6s var(--ev-plyn)}
-.ev-sit .je-aktivni .situation_viz{opacity:1;max-height:20rem;margin-top:1rem;transform:none;transition:opacity var(--ev-t-text) var(--ev-plyn) .68s,transform var(--ev-t-posun) var(--ev-plyn) .68s,max-height 1.1s var(--ev-plyn) .2s,margin-top 1.1s var(--ev-plyn) .2s,border-color .6s var(--ev-plyn)}
+.ev-spanel{display:flex;flex-direction:column;overflow:hidden;flex:0 0 auto;height:1.3125rem;min-height:1.3125rem;transition:height 1.1s var(--ev-plyn)}
+.ev-spanel>div{display:flex;flex-direction:column;flex:1 1 auto;min-height:0}
+.je-aktivni .ev-spanel{flex:1 1 auto;height:auto}
+.ev-sit .roste .ev-spanel{flex:0 0 auto}
+.ev-mezera2{flex:1 1 0;min-height:0}
+.ev-spanel .margin-top,.ev-sit .situation_viz{opacity:0;transform:translateY(16px);transition:opacity .26s var(--ev-plyn),transform .26s var(--ev-plyn),border-color .6s var(--ev-plyn)}
+.ev-sit .situation_viz{margin-top:1rem}
+.je-aktivni .ev-spanel .margin-top{opacity:1;transform:none;transition:opacity var(--ev-t-text) var(--ev-plyn) .36s,transform var(--ev-t-posun) var(--ev-plyn) .36s}
+.ev-sit .je-aktivni .situation_viz{opacity:1;transform:none;transition:opacity var(--ev-t-text) var(--ev-plyn) .48s,transform var(--ev-t-posun) var(--ev-plyn) .48s,border-color .6s var(--ev-plyn)}
 }
 @media (max-width:991px){.ev-poc{display:none}}
 
@@ -229,7 +232,7 @@
 .w-mod-js .hero_grid>div:first-child{animation:none}
 .w-mod-js .section_hero .hero_visual{opacity:var(--hv-op,1);translate:none}
 .w-mod-js .section_hero .hero_visual-image.is-lit,.hero_glow{opacity:1}
-.ev-panel .flow_text,.ev-panel .flow_fig{opacity:1;transform:none}
+.ev-panel .flow_text,.ev-panel .flow_fig,.ev-spanel .margin-top,.ev-sit .situation_viz{opacity:1;transform:none}
 .vdlg::backdrop{animation:none}
 }
 

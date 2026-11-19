@@ -306,12 +306,16 @@
     m.classList.add('ev-sit');
     bunky.forEach(function (b, k) {
       var card = b.querySelector('.situation_card');
-      var txt = card && card.querySelector(':scope > .margin-top');
-      if (txt) {
-        var o = el('div', 'ev-open'), inn = el('div');
-        txt.parentNode.insertBefore(o, txt); inn.appendChild(txt); o.appendChild(inn);
-        var m2 = el('div', 'ev-mezera2'); m2.setAttribute('aria-hidden', 'true');
-        o.parentNode.insertBefore(m2, o.nextSibling);
+      // Text a doklad jdou do jednoho panelu, který roste výškou jako u karet
+      // postupu: nadpis nad ním pak vyjíždí jednou plynulou křivkou.
+      var txt = card && card.querySelector(':scope > .margin-top'), viz = card && card.querySelector(':scope > .situation_viz');
+      if (txt || viz) {
+        var pan = el('div', 'ev-spanel'), inn = el('div');
+        (txt || viz).parentNode.insertBefore(pan, txt || viz);
+        if (txt) inn.appendChild(txt);
+        var m2 = el('div', 'ev-mezera2'); m2.setAttribute('aria-hidden', 'true'); inn.appendChild(m2);
+        if (viz) inn.appendChild(viz);
+        pan.appendChild(inn); b._pan = pan; b._card = card;
       }
       var poc = el('div', 'ev-poc', '<span>' + (k + 1) + '/' + bunky.length + '</span><i></i>');
       poc.setAttribute('aria-hidden', 'true');
@@ -319,12 +323,39 @@
       vloziVypln(b);
     });
     m.classList.add('ma-vypln');
-    var i = 0, timer = null, rozjeto = false;
+    var i = 0, timer = null, rozjeto = false, DOBA = 1100, desk = matchMedia('(min-width: 992px)');
+    // Cíl růstu = místo, které panelu v kartě zbude (výška karty minus
+    // ostatní obsah a nejmenší mezera nad nadpisem), stejně jako u postupu.
+    function misto(b) {
+      var card = b._card, pan = b._pan, cs = getComputedStyle(card);
+      var zbyva = card.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+      $$(':scope > *', card).forEach(function (ch) {
+        if (ch === pan) return;
+        var s = getComputedStyle(ch);
+        if (s.position === 'absolute' || s.display === 'none') return;
+        var v = ch.classList.contains('situation_spacer') ? (parseFloat(s.minHeight) || 0) : ch.offsetHeight;
+        zbyva -= v + parseFloat(s.marginTop) + parseFloat(s.marginBottom);
+      });
+      return Math.max(Math.round(zbyva), 0);
+    }
+    function rost(b, on) {
+      var pan = b._pan, anim = pan && !REDUCED && desk.matches;
+      // výchozí výšku změřit ještě před přepnutím třídy (pak by byla už cílová)
+      var od = anim ? pan.offsetHeight : 0;
+      b.classList.toggle('je-aktivni', on);
+      if (!anim) return;
+      clearTimeout(pan._cas);
+      b.classList.add('roste');
+      pan.style.height = '';
+      var cil = on ? misto(b) : parseFloat(getComputedStyle(pan).minHeight) || 0;
+      pan.style.height = od + 'px'; void pan.offsetHeight; pan.style.height = cil + 'px';
+      pan._cas = setTimeout(function () { pan.style.height = ''; b.classList.remove('roste'); }, DOBA + 60);
+    }
     function ukaz(n, e) {
       i = n;
       bunky.forEach(function (b, k) {
         if (k === n && !b.classList.contains('je-aktivni')) odkud(b, e);
-        b.classList.toggle('je-aktivni', k === n);
+        if (b.classList.contains('je-aktivni') !== (k === n)) rost(b, k === n);
         b.classList.toggle('bez-svisle', n % 2 === 1 && k === n - 1);
         b.classList.toggle('bez-vodorovne', n >= 2 && k === n - 2);
         b.classList.remove('odpocita');
