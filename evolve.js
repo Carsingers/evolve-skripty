@@ -423,16 +423,25 @@
     // nedá, karta se v tu chvíli teprve rozšiřuje a text by vyšel vyšší,
     // takže by nadpis na konci ještě dojel. Na mobilu jsou karty pod sebou
     // a panel má výšku svého obsahu.
-    function misto(c, pan) {
-      if (matchMedia('(max-width: 991px)').matches) return pan.offsetHeight;
-      var cs = getComputedStyle(c), zbyva = c.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    // Výška ostatního obsahu karty (bez panelu, mezera nad nadpisem jen
+    // minimem). Měří se v zmer() při cílové šířce otevřené karty: v úzké
+    // kartě by se delší nadpis zalomil na víc řádků a nadpis by na konci
+    // poskočil.
+    function ostatni(c, pan) {
+      var sum = 0;
       $$(':scope > *', c).forEach(function (ch) {
         if (ch === pan) return;
         var s = getComputedStyle(ch);
         if (s.position === 'absolute' || s.position === 'fixed' || s.display === 'none') return;
         var v = ch.classList.contains('flow_spacer') ? (parseFloat(s.minHeight) || 0) : ch.offsetHeight;
-        zbyva -= v + parseFloat(s.marginTop) + parseFloat(s.marginBottom);
+        sum += v + parseFloat(s.marginTop) + parseFloat(s.marginBottom);
       });
+      return sum;
+    }
+    function misto(c, pan) {
+      if (matchMedia('(max-width: 991px)').matches) return pan.offsetHeight;
+      var cs = getComputedStyle(c), zbyva = c.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+      zbyva -= c._ost != null ? c._ost : ostatni(c, pan);
       return Math.max(Math.round(zbyva), 0);
     }
     function zavri(c, pan) {
@@ -450,6 +459,7 @@
     var cas = null;
     function zmer() {
       row.style.minHeight = '';
+      cards.forEach(function (c) { c._ost = null; });
       if (matchMedia('(max-width: 991px)').matches) return;
       var puvodni = cards.map(function (c) { var p = panel(c); return [c.classList.contains('is-active'), p.hidden, p.style.height, p.style.width]; });
       row.classList.add('ev-mereni');
@@ -457,6 +467,7 @@
       cards.forEach(function (c) {
         cards.forEach(function (d) { var p = panel(d); stav(d, d === c); p.hidden = d !== c; p.style.height = ''; p.style.width = ''; });
         max = Math.max(max, row.offsetHeight);
+        c._ost = ostatni(c, panel(c));
       });
       cards.forEach(function (d, k) { var p = panel(d); stav(d, puvodni[k][0]); p.hidden = puvodni[k][1]; p.style.height = puvodni[k][2]; p.style.width = puvodni[k][3]; });
       void row.offsetHeight;
